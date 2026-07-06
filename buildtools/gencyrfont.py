@@ -129,7 +129,7 @@ with open(os.path.join(OUT_DIR, "cyrfont.c"), "w") as f:
     f.write("\treturn (int)('?' - 0x20);\n")
     f.write("}\n\n")
 
-    f.write("const u8 cyrFontData[%d] ATTRIBUTE_ALIGN(32) = {\n\t" % len(out))
+    f.write("const u8 cyrFontData[%d] __attribute__((aligned(32))) = {\n\t" % len(out))
     for i, b in enumerate(out):
         f.write("0x%02x," % b)
         if (i + 1) % 16 == 0:
