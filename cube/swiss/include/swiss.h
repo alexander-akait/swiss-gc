@@ -20,6 +20,7 @@
 #include "config.h"
 #include "deviceHandler.h"
 #include "gui/FrameBufferMagic.h"
+#include "lang.h"
 
 #define in_range(x, a, b) (((x) >= (a)) && ((x) <= (b)))
 
@@ -176,6 +177,7 @@ typedef struct {
 	int aveCompat;
 	int rt4kProfile;
 	u8 configDeviceId;	// see deviceHandler.h
+	int uiLanguage;		// Swiss UI language, see enum uiLanguage in lang.h
 	int fileBrowserType;
 	int appsBrowserType;
 	int gameBrowserType;

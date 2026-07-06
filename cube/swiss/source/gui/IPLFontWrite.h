@@ -24,6 +24,7 @@ extern GXColor deSelectedColor;
 extern char txtbuffer[2048];
 
 void init_font(void);
+void initCyrFont(void);
 void drawString(int x, int y, const char *string, float scale, int align, GXColor fontColor);
 void drawStringWithCaret(int x, int y, const char *string, float scale, int align, GXColor fontColor, int caretPosition, GXColor caretColor);
 void drawStringEllipsis(int x, int y, const char *string, float scale, int align, GXColor fontColor, bool rotateVertical, int maxSize);

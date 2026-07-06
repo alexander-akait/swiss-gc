@@ -2264,6 +2264,7 @@ void DrawInit(GXRModeObj *videoMode, bool black) {
 	setVideoMode(videoMode);
 	padsInit();
 	init_font();
+	initCyrFont();
 	init_textures();
 	uiDrawObj_t *container = DrawContainer();
 	if(!black) {
