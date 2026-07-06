@@ -31,6 +31,9 @@ GXColor deSelectedColor = (GXColor) {80,80,73,255};
 static GXTexObj cyrTexObj;
 static bool cyrFontReady = false;
 
+// Defined further down; the Cyrillic helpers below are placed before it.
+void drawFontInit(void);
+
 // True if the string contains any byte outside 7-bit ASCII (i.e. UTF-8 lead/
 // continuation bytes for a code point the ROM font cannot render).
 static bool strHasUTF8(const char *s)
