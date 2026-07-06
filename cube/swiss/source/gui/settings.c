@@ -86,6 +86,7 @@ static char *tooltips_global[PAGE_GLOBAL_MAX+1] = {
 };
 
 static char *tooltips_interface[PAGE_INTERFACE_MAX+1] = {
+	[SET_UI_LANG] = "UI Language:\n\nSelects the language used for the Swiss interface.\n\nEnglish uses the console's built-in font. Other languages\n(e.g. Russian) are drawn with a bundled font.",
 	[SET_FILEBROWSER_TYPE] = "File Browser Type:\n\nStandard - Displays files with minimal detail (default)\n\nCarousel - Suited towards Game/DOL only use, consider combining\nthis option with the File Management setting turned off\nand Hide Unknown File Types turned on for a better experience.",
 	[SET_APPSBROWSER_TYPE] = "File Browser Type for apps:\n\nApplicable to the /apps directory.",
 	[SET_GAMEBROWSER_TYPE] = "File Browser Type for games:\n\nApplicable to the /games directory.",
@@ -174,7 +175,7 @@ void drawSettingEntryString(uiDrawObj_t* page, int *y, char *label, char *key, b
 }
 
 void drawSettingEntryBoolean(uiDrawObj_t* page, int *y, char *label, bool boolval, bool selected, bool enabled) {
-	drawSettingEntryString(page, y, label, boolval ? "Yes" : "No", selected, enabled);
+	drawSettingEntryString(page, y, label, boolval ? _("Yes") : _("No"), selected, enabled);
 }
 
 void drawSettingEntryNumeric(uiDrawObj_t* page, int *y, char *label, int num, bool selected, bool enabled) {
@@ -227,14 +228,14 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 	// Add paging and save/cancel buttons
 	if(page_num != PAGE_MIN) {
 		isNavOption = option == settings_count_pp[page_num]-(page_num != PAGE_MAX ? 3:2);
-		DrawAddChild(page, DrawSelectableButton(50, page_nav_y, -1, 420, "Back", isNavOption));
+		DrawAddChild(page, DrawSelectableButton(50, page_nav_y, -1, 420, _("Back"), isNavOption));
 	}
 	if(page_num != PAGE_MAX) {
 		isNavOption = isNavOption || option == settings_count_pp[page_num]-2;
-		DrawAddChild(page, DrawSelectableButton(510, page_nav_y, -1, 420, "Next", option == settings_count_pp[page_num]-2 ? B_SELECTED:B_NOSELECT));
+		DrawAddChild(page, DrawSelectableButton(510, page_nav_y, -1, 420, _("Next"), option == settings_count_pp[page_num]-2 ? B_SELECTED:B_NOSELECT));
 	}
-	DrawAddChild(page, DrawSelectableButton(120, page_saveexit_y, -1, 455, "Save & Exit", option == settings_count_pp[page_num]-1 ? B_SELECTED:B_NOSELECT));
-	DrawAddChild(page, DrawSelectableButton(320, page_saveexit_y, -1, 455, "Discard & Exit", option ==  settings_count_pp[page_num] ? B_SELECTED:B_NOSELECT));
+	DrawAddChild(page, DrawSelectableButton(120, page_saveexit_y, -1, 455, _("Save & Exit"), option == settings_count_pp[page_num]-1 ? B_SELECTED:B_NOSELECT));
+	DrawAddChild(page, DrawSelectableButton(320, page_saveexit_y, -1, 455, _("Discard & Exit"), option ==  settings_count_pp[page_num] ? B_SELECTED:B_NOSELECT));
 	isNavOption = isNavOption || (option >= settings_count_pp[page_num]-1);
 	
 	int page_y_ofs = 119;
@@ -244,57 +245,58 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 		int scrollBarHeight = 90+(settings_per_page*20);
 		int scrollBarTabHeight = (int)((float)scrollBarHeight/(float)SET_PAGE_1_NEXT);
 		DrawAddChild(page, DrawVertScrollBar(getVideoMode()->fbWidth-45, 110, 25, scrollBarHeight, (float)((float)option/(float)(SET_PAGE_1_NEXT-1)),scrollBarTabHeight));
-		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, "Global Settings (1/6):"));
+		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, _("Global Settings (1/6):")));
 		bool tvEnable = swissSettings.aveCompat != AVE_RVL_COMPAT;
 		bool dvdEnable = deviceHandler_getDeviceAvailable(&__device_dvd);
 		bool dtvEnable = !in_range(swissSettings.aveCompat, AVE_N_DOL_COMPAT, AVE_P_DOL_COMPAT);
 		bool rt4kEnable = in_range(swissSettings.aveCompat, GCDIGITAL_COMPAT, GCVIDEO_COMPAT);
 		// TODO settings to a new typedef that ties type etc all together, then draw a "page" of these rather than this at some point.
 		if(option < SET_AVE_COMPAT) {
-			drawSettingEntryString(page, &page_y_ofs, "System Boot Mode:", swissSettings.sramBoot ? "Production" : "Default", option == SET_SYS_BOOTMODE, true);
-			drawSettingEntryString(page, &page_y_ofs, "System Sound:", swissSettings.sramStereo ? "Stereo" : "Mono", option == SET_SYS_SOUND, true);
-			drawSettingEntryString(page, &page_y_ofs, "System Video:", sramVideoStr[swissSettings.sramVideo], option == SET_SYS_VIDEO, tvEnable);
+			drawSettingEntryString(page, &page_y_ofs, _("System Boot Mode:"), swissSettings.sramBoot ? _("Production") : _("Default"), option == SET_SYS_BOOTMODE, true);
+			drawSettingEntryString(page, &page_y_ofs, _("System Sound:"), swissSettings.sramStereo ? _("Stereo") : _("Mono"), option == SET_SYS_SOUND, true);
+			drawSettingEntryString(page, &page_y_ofs, _("System Video:"), sramVideoStr[swissSettings.sramVideo], option == SET_SYS_VIDEO, tvEnable);
 			sprintf(sramHOffsetStr, "%+hi", swissSettings.sramHOffset);
-			drawSettingEntryString(page, &page_y_ofs, "Screen Position:", sramHOffsetStr, option == SET_SCREEN_POS, true);
-			drawSettingEntryString(page, &page_y_ofs, "System Language:", sramLanguageStr[swissSettings.sramLanguage], option == SET_SYS_LANG, true);
-			drawSettingEntryString(page, &page_y_ofs, "Configuration Device:", getConfigDeviceName(&swissSettings), option == SET_CONFIG_DEV, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Screen Position:"), sramHOffsetStr, option == SET_SCREEN_POS, true);
+			drawSettingEntryString(page, &page_y_ofs, _("System Language:"), sramLanguageStr[swissSettings.sramLanguage], option == SET_SYS_LANG, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Configuration Device:"), getConfigDeviceName(&swissSettings), option == SET_CONFIG_DEV, true);
 			sprintf(uiVModeStr, "%s%s", getVideoModeString(getVideoModeFromSwissSetting(swissSettings.uiVMode)), swissSettings.uiVMode == 0 ? " (Auto) " : "");
-			drawSettingEntryString(page, &page_y_ofs, "Swiss Video Mode:", uiVModeStr, option == SET_SWISS_VIDEOMODE, true);
-			drawSettingEntryBoolean(page, &page_y_ofs, "Init DVD Drive at startup:", swissSettings.initDVDDriveAtStart, option == SET_INIT_DRIVE, dvdEnable);
-			drawSettingEntryBoolean(page, &page_y_ofs, "Stop DVD Drive motor:", swissSettings.stopMotor, option == SET_STOP_MOTOR, dvdEnable);
-			drawSettingEntryString(page, &page_y_ofs, "Configure Audio Buffer:", configAudioBufferStr[swissSettings.configAudioBuffer], option == SET_AUDIO_BUFFER, dvdEnable);
-			drawSettingEntryString(page, &page_y_ofs, "SD/IDE-EXI Speed:", swissSettings.exiSpeed ? "27 MHz" : "13.5 MHz", option == SET_EXI_SPEED, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Swiss Video Mode:"), uiVModeStr, option == SET_SWISS_VIDEOMODE, true);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("Init DVD Drive at startup:"), swissSettings.initDVDDriveAtStart, option == SET_INIT_DRIVE, dvdEnable);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("Stop DVD Drive motor:"), swissSettings.stopMotor, option == SET_STOP_MOTOR, dvdEnable);
+			drawSettingEntryString(page, &page_y_ofs, _("Configure Audio Buffer:"), _(configAudioBufferStr[swissSettings.configAudioBuffer]), option == SET_AUDIO_BUFFER, dvdEnable);
+			drawSettingEntryString(page, &page_y_ofs, _("SD/IDE-EXI Speed:"), swissSettings.exiSpeed ? "27 MHz" : "13.5 MHz", option == SET_EXI_SPEED, true);
 		} else {
-			drawSettingEntryString(page, &page_y_ofs, "AVE Compatibility:", aveCompatStr[swissSettings.aveCompat], option == SET_AVE_COMPAT, true);
-			drawSettingEntryString(page, &page_y_ofs, "Force DTV Status:", forceDTVStatusStr[swissSettings.forceDTVStatus], option == SET_FORCE_DTVSTATUS, dtvEnable);
-			drawSettingEntryBoolean(page, &page_y_ofs, "RetroTINK-4K HDMI Input:", swissSettings.rt4kOptim, option == SET_RT4K_OPTIM, rt4kEnable);
-			drawSettingEntryBoolean(page, &page_y_ofs, "Disable Controller Recalibration:", swissSettings.disableRecalibration, option == SET_DISABLE_RECALIB, true);
-			drawSettingEntryBoolean(page, &page_y_ofs, "Disable Controller Rumble:", swissSettings.disableRumble, option == SET_DISABLE_RUMBLE, true);
-			drawSettingEntryString(page, &page_y_ofs, "Enable USB Gecko:", enableUSBGeckoStr[swissSettings.enableUSBGecko], option == SET_ENABLE_USBGECKO, true);
-			drawSettingEntryBoolean(page, &page_y_ofs, "Wait for USB Gecko:", swissSettings.waitForUSBGecko, option == SET_WAIT_USBGECKO, true);
-			drawSettingEntryString(page, &page_y_ofs, "Simulated MRAM Size:", simulatedMemSizeStr[swissSettings.simulatedMemSize], option == SET_SIMMEMSIZE, true);
+			drawSettingEntryString(page, &page_y_ofs, _("AVE Compatibility:"), aveCompatStr[swissSettings.aveCompat], option == SET_AVE_COMPAT, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Force DTV Status:"), forceDTVStatusStr[swissSettings.forceDTVStatus], option == SET_FORCE_DTVSTATUS, dtvEnable);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("RetroTINK-4K HDMI Input:"), swissSettings.rt4kOptim, option == SET_RT4K_OPTIM, rt4kEnable);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("Disable Controller Recalibration:"), swissSettings.disableRecalibration, option == SET_DISABLE_RECALIB, true);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("Disable Controller Rumble:"), swissSettings.disableRumble, option == SET_DISABLE_RUMBLE, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Enable USB Gecko:"), enableUSBGeckoStr[swissSettings.enableUSBGecko], option == SET_ENABLE_USBGECKO, true);
+			drawSettingEntryBoolean(page, &page_y_ofs, _("Wait for USB Gecko:"), swissSettings.waitForUSBGecko, option == SET_WAIT_USBGECKO, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Simulated MRAM Size:"), simulatedMemSizeStr[swissSettings.simulatedMemSize], option == SET_SIMMEMSIZE, true);
 			sprintf(sramTemperatureStr, "%+hi\260C", swissSettings.sramTemperature);
-			drawSettingEntryString(page, &page_y_ofs, "CPU Temperature Calibration:", sramTemperatureStr, option == SET_TAU_CALIB, is_gamecube());
+			drawSettingEntryString(page, &page_y_ofs, _("CPU Temperature Calibration:"), sramTemperatureStr, option == SET_TAU_CALIB, is_gamecube());
 		}
 	}
 	else if(page_num == PAGE_INTERFACE) {
-		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, "Interface Settings (2/6):"));
-		drawSettingEntryString(page, &page_y_ofs, "File Browser Type:", fileBrowserTypeStr[swissSettings.fileBrowserType], option == SET_FILEBROWSER_TYPE, true);
-		drawSettingEntryString(page, &page_y_ofs, "File Browser Type for apps:", fileBrowserTypeStr[swissSettings.appsBrowserType], option == SET_APPSBROWSER_TYPE, true);
-		drawSettingEntryString(page, &page_y_ofs, "File Browser Type for games:", fileBrowserTypeStr[swissSettings.gameBrowserType], option == SET_GAMEBROWSER_TYPE, true);
-		drawSettingEntryBoolean(page, &page_y_ofs, "File Management:", swissSettings.enableFileManagement, option == SET_FILE_MGMT, true);
-		drawSettingEntryString(page, &page_y_ofs, "Recent List:", recentListLevelStr[swissSettings.recentListLevel], option == SET_RECENT_LIST, true);
-		drawSettingEntryBoolean(page, &page_y_ofs, "Show hidden files:", swissSettings.showHiddenFiles, option == SET_SHOW_HIDDEN, true);
-		drawSettingEntryBoolean(page, &page_y_ofs, "Hide unknown file types:", swissSettings.hideUnknownFileTypes, option == SET_HIDE_UNK, true);
-		drawSettingEntryBoolean(page, &page_y_ofs, "Boot without prompts:", swissSettings.autoBoot, option == SET_AUTOBOOT, true);
-		drawSettingEntryString(page, &page_y_ofs, "Flatten directory:", swissSettings.flattenDir, option == SET_FLATTEN_DIR, true);
+		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, _("Interface Settings (2/6):")));
+		drawSettingEntryString(page, &page_y_ofs, _("UI Language:"), uiLanguageStr[swissSettings.uiLanguage], option == SET_UI_LANG, true);
+		drawSettingEntryString(page, &page_y_ofs, _("File Browser Type:"), _(fileBrowserTypeStr[swissSettings.fileBrowserType]), option == SET_FILEBROWSER_TYPE, true);
+		drawSettingEntryString(page, &page_y_ofs, _("File Browser Type for apps:"), _(fileBrowserTypeStr[swissSettings.appsBrowserType]), option == SET_APPSBROWSER_TYPE, true);
+		drawSettingEntryString(page, &page_y_ofs, _("File Browser Type for games:"), _(fileBrowserTypeStr[swissSettings.gameBrowserType]), option == SET_GAMEBROWSER_TYPE, true);
+		drawSettingEntryBoolean(page, &page_y_ofs, _("File Management:"), swissSettings.enableFileManagement, option == SET_FILE_MGMT, true);
+		drawSettingEntryString(page, &page_y_ofs, _("Recent List:"), _(recentListLevelStr[swissSettings.recentListLevel]), option == SET_RECENT_LIST, true);
+		drawSettingEntryBoolean(page, &page_y_ofs, _("Show hidden files:"), swissSettings.showHiddenFiles, option == SET_SHOW_HIDDEN, true);
+		drawSettingEntryBoolean(page, &page_y_ofs, _("Hide unknown file types:"), swissSettings.hideUnknownFileTypes, option == SET_HIDE_UNK, true);
+		drawSettingEntryBoolean(page, &page_y_ofs, _("Boot without prompts:"), swissSettings.autoBoot, option == SET_AUTOBOOT, true);
+		drawSettingEntryString(page, &page_y_ofs, _("Flatten directory:"), swissSettings.flattenDir, option == SET_FLATTEN_DIR, true);
 	}
 	else if(page_num == PAGE_NETWORK) {
 		int settings_per_page = 10;
 		int scrollBarHeight = 90+(settings_per_page*20);
 		int scrollBarTabHeight = (int)((float)scrollBarHeight/(float)SET_PAGE_3_BACK);
 		DrawAddChild(page, DrawVertScrollBar(getVideoMode()->fbWidth-45, 110, 25, scrollBarHeight, (float)((float)option/(float)(SET_PAGE_3_BACK-1)),scrollBarTabHeight));
-		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, "Network Settings (3/6):"));
+		DrawAddChild(page, DrawLabel(page_x_ofs_key, 77, _("Network Settings (3/6):")));
 		bool netEnable = net_initialized || bba_exists(LOC_ANY);
 		// TODO settings to a new typedef that ties type etc all together, then draw a "page" of these rather than this at some point.
 		if(option < SET_FTP_USER) {
@@ -336,7 +338,7 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 		drawSettingEntryBoolean(page, &page_y_ofs, "Pause for resolution change:", swissSettings.pauseAVOutput, option == SET_PAUSE_AVOUTPUT, enabledHypervisor);
 		drawSettingEntryBoolean(page, &page_y_ofs, "Auto-load cheats:", swissSettings.autoCheats, option == SET_ALL_CHEATS, true);
 		drawSettingEntryBoolean(page, &page_y_ofs, "WiiRD debugging:", swissSettings.wiirdDebug, option == SET_WIIRDDBG, dbgEnable);
-		drawSettingEntryString(page, &page_y_ofs, "Reset to defaults", NULL, option == SET_GLOBAL_DEFAULTS, true);
+		drawSettingEntryString(page, &page_y_ofs, _("Reset to defaults"), NULL, option == SET_GLOBAL_DEFAULTS, true);
 	}
 	else if(page_num == PAGE_GAME_DEFAULTS) {
 		int settings_per_page = 10;
@@ -375,7 +377,7 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 			drawSettingEntryBoolean(page, &page_y_ofs, "Disable Hypervisor:", swissSettings.disableHypervisor, option == SET_DEFAULT_DISABLE_HYPERVISOR, enabledCleanBoot);
 			drawSettingEntryBoolean(page, &page_y_ofs, "Prefer Clean Boot:", swissSettings.preferCleanBoot, option == SET_DEFAULT_CLEAN_BOOT, enabledCleanBoot);
 			drawSettingEntryNumeric(page, &page_y_ofs, "RetroTINK-4K Profile:", swissSettings.rt4kProfile, option == SET_DEFAULT_RT4K_PROFILE, is_rt4k_alive());
-			drawSettingEntryString(page, &page_y_ofs, "Reset to defaults", NULL, option == SET_DEFAULT_DEFAULTS, true);
+			drawSettingEntryString(page, &page_y_ofs, _("Reset to defaults"), NULL, option == SET_DEFAULT_DEFAULTS, true);
 		}
 	}
 	else if(page_num == PAGE_GAME) {
@@ -417,7 +419,7 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 				drawSettingEntryBoolean(page, &page_y_ofs, "Disable Hypervisor:", gameConfig->disableHypervisor, option == SET_DISABLE_HYPERVISOR, enabledCleanBoot);
 				drawSettingEntryBoolean(page, &page_y_ofs, "Prefer Clean Boot:", gameConfig->preferCleanBoot, option == SET_CLEAN_BOOT, enabledCleanBoot);
 				drawSettingEntryNumeric(page, &page_y_ofs, "RetroTINK-4K Profile:", gameConfig->rt4kProfile, option == SET_RT4K_PROFILE, is_rt4k_alive());
-				drawSettingEntryString(page, &page_y_ofs, "Reset to defaults", NULL, option == SET_DEFAULTS, true);
+				drawSettingEntryString(page, &page_y_ofs, _("Reset to defaults"), NULL, option == SET_DEFAULTS, true);
 			}
 		}
 		else {
@@ -447,7 +449,7 @@ uiDrawObj_t* settings_draw_page(int page_num, int option, ConfigEntry *gameConfi
 				drawSettingEntryBoolean(page, &page_y_ofs, "Disable Hypervisor:", swissSettings.disableHypervisor, option == SET_DISABLE_HYPERVISOR, false);
 				drawSettingEntryBoolean(page, &page_y_ofs, "Prefer Clean Boot:", swissSettings.preferCleanBoot, option == SET_CLEAN_BOOT, false);
 				drawSettingEntryNumeric(page, &page_y_ofs, "RetroTINK-4K Profile:", swissSettings.rt4kProfile, option == SET_DEFAULT_RT4K_PROFILE, false);
-				drawSettingEntryString(page, &page_y_ofs, "Reset to defaults", NULL, option == SET_DEFAULTS, false);
+				drawSettingEntryString(page, &page_y_ofs, _("Reset to defaults"), NULL, option == SET_DEFAULTS, false);
 			}
 		}
 	}
@@ -619,6 +621,10 @@ void settings_toggle(int page, int option, int direction, ConfigEntry *gameConfi
 	}
 	else if(page == PAGE_INTERFACE) {
 		switch(option) {
+			case SET_UI_LANG:
+				swissSettings.uiLanguage += direction;
+				swissSettings.uiLanguage = (swissSettings.uiLanguage + UILANG_MAX) % UILANG_MAX;
+			break;
 			case SET_FILEBROWSER_TYPE:
 				swissSettings.fileBrowserType += direction;
 				swissSettings.fileBrowserType = (swissSettings.fileBrowserType + BROWSER_MAX) % BROWSER_MAX;

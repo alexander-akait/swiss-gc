@@ -175,6 +175,7 @@ int config_update_global(bool checkConfigDevice) {
 	fprintf(fp, "InitNetwork=%s\r\n", swissSettings.initNetworkAtStart ? "Yes":"No");
 	fprintf(fp, "IGRType=%s\r\n", igrTypeStr[swissSettings.igrType]);
 	fprintf(fp, "AVECompat=%s\r\n", aveCompatStr[swissSettings.aveCompat]);
+	fprintf(fp, "UILanguage=%s\r\n", uiLanguageStr[swissSettings.uiLanguage]);
 	fprintf(fp, "FileBrowserType=%s\r\n", fileBrowserTypeStr[swissSettings.fileBrowserType]);
 	fprintf(fp, "AppsBrowserType=%s\r\n", fileBrowserTypeStr[swissSettings.appsBrowserType]);
 	fprintf(fp, "GameBrowserType=%s\r\n", fileBrowserTypeStr[swissSettings.gameBrowserType]);
@@ -957,6 +958,14 @@ void config_parse_global(char *configData) {
 					for(int i = 0; i < AVE_COMPAT_MAX; i++) {
 						if(!strcmp(aveCompatStr[i], value)) {
 							swissSettings.aveCompat = i;
+							break;
+						}
+					}
+				}
+				else if(!strcmp("UILanguage", name)) {
+					for(int i = 0; i < UILANG_MAX; i++) {
+						if(!strcmp(uiLanguageStr[i], value)) {
+							swissSettings.uiLanguage = i;
 							break;
 						}
 					}
